@@ -12,14 +12,6 @@
             url: {{HOMEPAGE_VAR_QBITTORRENT_URL}}
             username: {{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}
             password: {{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}
-    - SABnzdb:
-        href: {{HOMEPAGE_VAR_SABNZDB_URL}}
-        description: Usenet downloader
-        icon: sabnzbd.png
-        widget:
-            type: sabnzbd
-            url: {{HOMEPAGE_VAR_SABNZDB_URL}}
-            key: {{HOMEPAGE_VAR_SABNZDB_API}}
     - Sonarr Anime:
         href: {{HOMEPAGE_VAR_SONARR_ANIME_URL}}
         description: Anime downloader

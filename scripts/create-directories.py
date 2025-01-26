@@ -16,16 +16,6 @@ media_dict = {
         "music":"",
         "books":""
     },
-    "usenet": {
-        "complete": {
-            "anime": "",
-            "books": "",
-            "movies": "",
-            "music": "",
-            "tv":""
-        },
-        "incomplete":""
-    }
 }
 
 def create_folders(folder_dict, parent_path=''):
@@ -62,14 +52,6 @@ data
 │   ├── movies
 │   ├── music
 │   └── tv
-└── usenet
-    ├── complete
-    │   ├── anime
-    │   ├── books
-    │   ├── movies
-    │   ├── music
-    │   └── tv
-    └── incomplete
 
 Remember to run these commands to give your user permissions over these folders:
 sudo chown -R $USER:$USER /data

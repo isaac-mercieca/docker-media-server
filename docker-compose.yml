@@ -14,7 +14,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/radarr:/config
       - ${MEDIA_DATA_FOLDER}:/data
-  
+      - ${MEDIA_DATA_FOLDER}/torrents:/app/qBittorrent/downloads
+
   sonarr:
     container_name: sonarr
     hostname: sonarr.internal
@@ -30,7 +31,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/sonarr:/config
       - ${MEDIA_DATA_FOLDER}:/data
-    
+      - ${MEDIA_DATA_FOLDER}/torrents:/app/qBittorrent/downloads
+
   sonarr-anime:
     container_name: sonarr-anime
     image: ghcr.io/hotio/sonarr:latest
@@ -45,6 +47,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/sonarr-anime:/config
       - ${MEDIA_DATA_FOLDER}:/data
+      - ${MEDIA_DATA_FOLDER}/torrents:/app/qBittorrent/downloads
 
   lidarr:
     container_name: lidarr
@@ -92,7 +95,7 @@ services:
   flaresolverr:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
-    restart: unless-stopped 
+    restart: unless-stopped
     ports:
       - ${FLARESOLVERR_PORT}:8191
     environment:
@@ -115,15 +118,15 @@ services:
       - PGID=${PGID}
       - TZ=${TIMEZONE}
       - ${QBITTORRENT_WEBUI_PORT}=8080
-      - VPN_ENABLED=true 
-      - VPN_CONF=wg0
-      - VPN_PROVIDER=proton
-      - VPN_LAN_NETWORK=192.168.10.0/24 
-      - VPN_LAN_LEAK_ENABLED=false
-      - VPN_AUTO_PORT_FORWARD=true
-      - VPN_KEEP_LOCAL_DNS=false
-      - VPN_FIREWALL_TYPE=auto
-      - VPN_HEALTHCHECK_ENABLED=true
+      #    - VPN_ENABLED=false
+      #    - VPN_CONF=wg0
+      #    - VPN_PROVIDER=proton
+      #    - VPN_LAN_NETWORK=192.168.10.0/24
+      #    - VPN_LAN_LEAK_ENABLED=false
+      #    - VPN_AUTO_PORT_FORWARD=true
+      #    - VPN_KEEP_LOCAL_DNS=false
+      #    - VPN_FIREWALL_TYPE=auto
+      #    - VPN_HEALTHCHECK_ENABLED=true
       - PRIVOXY_ENABLED=false
       - UNBOUND_ENABLED=false
     cap_add:
@@ -132,52 +135,20 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.all.disable_ipv6=1
     volumes:
-      - ./wireguard/wg0.conf:/config/wireguard/wg0.conf
+      # - ./wireguard:/config/wireguard
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/qbittorrent:/config
-      - ${MEDIA_DATA_FOLDER}/torrents:/data/torrents
-
-  sabnzbd:
-    image: ghcr.io/hotio/sabnzbd:latest
-    container_name: sabnzbd
-    hostname: sabnzbd.internal
-    restart: unless-stopped
-    ports:
-      - ${SABNZDB_PORT}:8080
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
-      - VPN_ENABLED=true 
-      - VPN_CONF=wg0
-      - VPN_PROVIDER=proton
-      - VPN_LAN_NETWORK=192.168.10.0/24 
-      - VPN_LAN_LEAK_ENABLED=false
-      - VPN_AUTO_PORT_FORWARD=true
-      - VPN_KEEP_LOCAL_DNS=false
-      - VPN_FIREWALL_TYPE=auto
-      - VPN_HEALTHCHECK_ENABLED=true
-      - PRIVOXY_ENABLED=false
-      - UNBOUND_ENABLED=false
-    cap_add:
-      - NET_ADMIN
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=1
-    volumes:
-      - ./wireguard/wg0.conf:/config/wireguard/wg0.conf
-      - ${APP_DATA}/sabnzbd:/config
-      - ${MEDIA_DATA_FOLDER}/usenet:/data/usenet
+      - ${MEDIA_DATA_FOLDER}/torrents:/app/qBittorrent/downloads
 
   emby:
     image: emby/embyserver:latest
     container_name: embyserver
     restart: on-failure
     ports:
-      - ${EMBY_HTTP_PORT}:8096 # HTTP port
+      - ${EMBY_PORT}:8096 # HTTP port
     environment:
       - UID=${PUID}
-      - GID=${PGID} 
+      - GID=${PGID}
       - TZ=${TIMEZONE}
     volumes:
       - ${APP_DATA}/emby:/config
@@ -196,7 +167,7 @@ services:
       - 4545:4545
     environment:
       - PUID=${PUID}
-      - PGID=${PGID} 
+      - PGID=${PGID}
       - TZ=${TIMEZONE}
     volumes:
       - /${APP_DATA}/requestrr:/config
@@ -235,35 +206,6 @@ services:
       - HOMEPAGE_VAR_QBITTORRENT_USERNAME=${QBITTORRENT_USERNAME}
       - HOMEPAGE_VAR_QBITTORRENT_PASSWORD=${QBITTORRENT_PASSWORD}
       - HOMEPAGE_VAR_QBITTORRENT_URL=${HOST_URL}:${QBITTORRENT_WEBUI_PORT}
-
-      # USENET
-      - HOMEPAGE_VAR_SABNZDB_URL=${HOST_URL}:${SABNZDB_PORT}
-      - HOMEPAGE_VAR_SABNZDB_API=${SABNZDB_API}
-
-      # NGINX PROXY MANAGER
-      - HOMEPAGE_VAR_NGINX_PROXY_MANAGER_URL=${HOST_URL}:${NGINX_PROXY_MANAGER_PORT}
-      - HOMEPAGE_VAR_NGINX_PROXY_MANAGER_USERNAME=${NGINX_PROXY_MANAGER_USERNAME}
-      - HOMEPAGE_VAR_NGINX_PROXY_MANAGER_PASSWORD=${NGINX_PROXY_MANAGER_PASSWORD}
-
-      # ADGUARD HOME
-      - HOMEPAGE_VAR_ADGUARDHOME1_URL=${ADGUARDHOME1_URL}
-      - HOMEPAGE_VAR_ADGUARDHOME2_URL=${ADGUARDHOME2_URL}
-      - HOMEPAGE_VAR_ADGUARDHOME_USERNAME=${ADGUARDHOME_USERNAME}
-      - HOMEPAGE_VAR_ADGUARDHOME_PASSWORD=${ADGUARDHOME_PASSWORD}
     volumes:
       - ${APP_DATA}/homepage:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${MEDIA_MOUNT_1}:/mnt/media1:ro              # Optional
-      - ${MEDIA_MOUNT_2}:/mnt/media2:ro              # Optional
-
-  nginx-proxy-manager:
-    container_name: nginx-proxy-manager
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
-    volumes:
-      - ${APP_DATA}/nginx-proxy-manager/data:/data
-      - ${APP_DATA}/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+      - ${MEDIA_MOUNT_1}:/mnt/media1:ro # Optional
