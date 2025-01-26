@@ -8,7 +8,6 @@
     disk:
         - /
         - /mnt/media1
-        - /mnt/media2
     cputemp: true
     uptime: true
 
