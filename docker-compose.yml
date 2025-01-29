@@ -152,10 +152,10 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${APP_DATA}/emby:/config
-      - ${MEDIA_PATH}/tv:/mnt/tv
-      - ${MEDIA_PATH}/movies:/mnt/movies
-      - ${MEDIA_PATH}/anime:/mnt/anime
-      - ${MEDIA_PATH}/music:/mnt/music
+      - ${MEDIA_DATA_FOLDER}/media/tv:/mnt/tv
+      - ${MEDIA_DATA_FOLDER}/media/movies:/mnt/movies
+      - ${MEDIA_DATA_FOLDER}/media/anime:/mnt/anime
+      - ${MEDIA_DATA_FOLDER}/media/music:/mnt/music
     devices:
       - /dev/dri:/dev/dri # VAAPI/NVDEC/NVENC render nodes
 
@@ -208,4 +208,4 @@ services:
       - HOMEPAGE_VAR_QBITTORRENT_URL=${HOST_URL}:${QBITTORRENT_WEBUI_PORT}
     volumes:
       - ${APP_DATA}/homepage:/app/config
-      - ${MEDIA_MOUNT_1}:/mnt/media1:ro # Optional
+      - ${MEDIA_DATA_FOLDER}:/mnt/media1:ro
