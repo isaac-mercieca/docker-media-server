@@ -14,9 +14,6 @@ layout:
   Media:
     style: column
     columns: 1
-  Development:
-    style: column
-    columns: 1
-  Miscellaneous:
+  Network:
     style: column
     columns: 1

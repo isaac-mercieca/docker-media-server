@@ -4,12 +4,14 @@ services:
     container_name: radarr
     image: ghcr.io/hotio/radarr:latest
     restart: unless-stopped
-    ports:
-      - ${RADARR_PORT}:7878
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`${RADARR_HOST}`)"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/radarr:/config
@@ -21,12 +23,14 @@ services:
     hostname: sonarr.internal
     image: ghcr.io/hotio/sonarr:latest
     restart: unless-stopped
-    ports:
-      - ${SONARR_PORT_TV}:8989
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`${SONARR_TV_HOST}`)"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/sonarr:/config
@@ -37,12 +41,14 @@ services:
     container_name: sonarr-anime
     image: ghcr.io/hotio/sonarr:latest
     restart: unless-stopped
-    ports:
-      - ${SONARR_PORT_ANIME}:8989
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr-anime.rule=Host(`${SONARR_ANIME_HOST}`)"
+      - "traefik.http.services.sonarr-anime.loadbalancer.server.port=8989"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/sonarr-anime:/config
@@ -53,12 +59,14 @@ services:
     container_name: lidarr
     image: ghcr.io/hotio/lidarr:latest
     restart: unless-stopped
-    ports:
-      - ${LIDARR_PORT}:8686
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lidarr.rule=Host(`${LIDARR_HOST}`)"
+      - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/lidarr:/config
@@ -68,12 +76,14 @@ services:
     container_name: bazarr
     image: ghcr.io/hotio/bazarr:latest
     restart: unless-stopped
-    ports:
-      - ${BAZARR_PORT}:6767
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=Host(`${BAZARR_HOST}`)"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
     volumes:
       - ${APP_DATA}/bazarr:/config
       - ${MEDIA_DATA_FOLDER}:/data
@@ -82,12 +92,14 @@ services:
     container_name: prowlarr
     image: ghcr.io/hotio/prowlarr:latest
     restart: unless-stopped
-    ports:
-      - ${PROWLARR_PORT}:9696
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_HOST}`)"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${APP_DATA}/prowlarr:/config
@@ -110,14 +122,13 @@ services:
     image: ghcr.io/hotio/qbittorrent:latest
     restart: unless-stopped
     ports:
-      - ${QBITTORRENT_TCP_UDP}:6881 # qbittorrent
-      - ${QBITTORRENT_TCP_UDP}:6881/udp # qbittorrent
-      - ${QBITTORRENT_WEBUI_PORT}:8080 # qbittorrent
+      - ${QBITTORRENT_TCP_UDP}:6881
+      - ${QBITTORRENT_TCP_UDP}:6881/udp
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TIMEZONE}
-      - ${QBITTORRENT_WEBUI_PORT}=8080
+      # - ${QBITTORRENT_WEBUI_PORT}=8080
       #    - VPN_ENABLED=false
       #    - VPN_CONF=wg0
       #    - VPN_PROVIDER=proton
@@ -129,6 +140,10 @@ services:
       #    - VPN_HEALTHCHECK_ENABLED=true
       - PRIVOXY_ENABLED=false
       - UNBOUND_ENABLED=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_HOST}`)"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
     cap_add:
       - NET_ADMIN
     sysctls:
@@ -145,11 +160,15 @@ services:
     container_name: embyserver
     restart: on-failure
     ports:
-      - ${EMBY_PORT}:8096 # HTTP port
+      - ${EMBY_PORT}:8096
     environment:
       - UID=${PUID}
       - GID=${PGID}
       - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.emby.rule=Host(`${EMBY_HOST}`)"
+      - "traefik.http.services.emby.loadbalancer.server.port=8096"
     volumes:
       - ${APP_DATA}/emby:/config
       - ${MEDIA_DATA_FOLDER}/media/tv:/mnt/tv
@@ -170,14 +189,12 @@ services:
       - PGID=${PGID}
       - TZ=${TIMEZONE}
     volumes:
-      - /${APP_DATA}/requestrr:/config
+      - ${APP_DATA}/requestrr:/config
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: unless-stopped
-    ports:
-      - ${HOMEPAGE_PORT}:3000
     environment:
       # GENERAL
       - PUID=${PUID}
@@ -185,27 +202,77 @@ services:
       - TZ=${TIMEZONE}
 
       # ARR STACK
-      - HOMEPAGE_VAR_SONARR_ANIME_URL=${HOST_URL}:${SONARR_PORT_ANIME}
+      - HOMEPAGE_VAR_SONARR_ANIME_URL=http://${SONARR_ANIME_HOST}
       - HOMEPAGE_VAR_SONARR_ANIME_API=${SONARR_ANIME_KEY}
-      - HOMEPAGE_VAR_SONARR_TV_URL=${HOST_URL}:${SONARR_PORT_TV}
+      - HOMEPAGE_VAR_SONARR_TV_URL=http://${SONARR_TV_HOST}
       - HOMEPAGE_VAR_SONARR_TV_API=${SONARR_TV_KEY}
-      - HOMEPAGE_VAR_RADARR_URL=${HOST_URL}:${RADARR_PORT}
+      - HOMEPAGE_VAR_RADARR_URL=http://${RADARR_HOST}
       - HOMEPAGE_VAR_RADARR_API=${RADARR_KEY}
-      - HOMEPAGE_VAR_LIDARR_URL=${HOST_URL}:${LIDARR_PORT}
+      - HOMEPAGE_VAR_LIDARR_URL=http://${LIDARR_HOST}
       - HOMEPAGE_VAR_LIDARR_API=${LIDARR_KEY}
-      - HOMEPAGE_VAR_BAZARR_URL=${HOST_URL}:${BAZARR_PORT}
+      - HOMEPAGE_VAR_BAZARR_URL=http://${BAZARR_HOST}
       - HOMEPAGE_VAR_BAZARR_API=${BAZARR_KEY}
-      - HOMEPAGE_VAR_PROWLARR_URL=${HOST_URL}:${PROWLARR_PORT}
+      - HOMEPAGE_VAR_PROWLARR_URL=http://${PROWLARR_HOST}
       - HOMEPAGE_VAR_PROWLARR_API=${PROWLARR_KEY}
 
       # EMBY
-      - HOMEPAGE_VAR_EMBY_URL=${HOST_URL}:${EMBY_PORT}
+      - HOMEPAGE_VAR_EMBY_URL=http://${EMBY_HOST}
       - HOMEPAGE_VAR_EMBY_API=${EMBY_KEY}
 
       # TORRENT
+      - HOMEPAGE_VAR_QBITTORRENT_URL=http://${QBITTORRENT_HOST}
       - HOMEPAGE_VAR_QBITTORRENT_USERNAME=${QBITTORRENT_USERNAME}
       - HOMEPAGE_VAR_QBITTORRENT_PASSWORD=${QBITTORRENT_PASSWORD}
-      - HOMEPAGE_VAR_QBITTORRENT_URL=${HOST_URL}:${QBITTORRENT_WEBUI_PORT}
+
+      # TRAEFIK
+      - HOMEPAGE_VAR_TRAEFIK_URL=http://${TRAEFIK_HOST}
+
+      # TECHNITIUM
+      - HOMEPAGE_VAR_TECHNITIUM_URL=http://${TECHNITIUM_HOST}
+      - HOMEPAGE_VAR_TECHNITIUM_API=${TECHNITIUM_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`${HOMEPAGE_HOST}`)"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
     volumes:
       - ${APP_DATA}/homepage:/app/config
       - ${MEDIA_DATA_FOLDER}:/mnt/media1:ro
+
+  technitium:
+    hostname: dns-server
+    image: technitium/dns-server:latest
+    container_name: dns-server
+    restart: unless-stopped
+    ports:
+      - "5380:5380/tcp" #DNS web console (HTTP)
+
+      # https://unix.stackexchange.com/questions/676942/free-up-port-53-on-ubuntu-so-custom-dns-server-can-use-it
+      - "53:53/udp" #DNS service
+      - "53:53/tcp" #DNS service
+    environment:
+      - DNS_SERVER_DOMAIN=dns-server
+      - DNS_SERVER_LOG_USING_LOCAL_TIME=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.technitium.rule=Host(`${TECHNITIUM_HOST}`)"
+      - "traefik.http.services.technitium.loadbalancer.server.port=5380"
+    volumes:
+      - ${APP_DATA}/technitium:/etc/dns
+
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
