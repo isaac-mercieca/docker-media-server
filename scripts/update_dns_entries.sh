@@ -79,8 +79,8 @@ for DOMAIN in $DOMAINS; do
     fi
 
     # Step 4: Add A Record for the domain with the required parameters
-    RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$ADD_URL" \
-         -d "zone=$DOMAIN" \
+    RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X GET "$ADD_URL" \
+         -G -d "zone=$DOMAIN" \
          -d "domain=$DOMAIN" \
          -d "type=A" \
          -d "ttl=" \
