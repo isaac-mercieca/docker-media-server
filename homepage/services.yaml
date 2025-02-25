@@ -62,6 +62,14 @@
             key: {{HOMEPAGE_VAR_BAZARR_API}}
 
 - Media:
+    - Jellyseerr:
+        href: {{HOMEPAGE_VAR_JELLYSEERR_URL}}
+        description: Media requests
+        icon: jellyseerr.png
+        widget:
+            type: jellyseerr
+            url: {{HOMEPAGE_VAR_JELLYSEERR_URL}}
+            key: {{HOMEPAGE_VAR_JELLYSEERR_API}}
     - Emby:
         href: {{HOMEPAGE_VAR_EMBY_URL}}
         description: Media player

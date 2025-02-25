@@ -155,6 +155,21 @@ services:
       - ${APP_DATA}/qbittorrent:/config
       - ${MEDIA_DATA_FOLDER}/torrents:/app/qBittorrent/downloads
 
+  jellyseerr: 
+    image: fallenbagel/jellyseerr
+    container_name: jellyseerr 
+    restart: unless-stopped
+    environment:
+      - UID=${PUID}
+      - GID=${PGID}
+      - TZ=${TIMEZONE}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyseerr.rule=Host(`${JELLYSEERR_HOST}`)"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+    volumes: 
+      - ${APP_DATA}/jellyseerr:/app/config
+
   emby:
     image: emby/embyserver:latest
     container_name: embyserver
@@ -177,19 +192,6 @@ services:
       - ${MEDIA_DATA_FOLDER}/media/music:/mnt/music
     devices:
       - /dev/dri:/dev/dri # VAAPI/NVDEC/NVENC render nodes
-
-  requestrr:
-    container_name: requestrr
-    image: ghcr.io/hotio/requestrr
-    restart: unless-stopped
-    ports:
-      - 4545:4545
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - ${APP_DATA}/requestrr:/config
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
@@ -214,6 +216,10 @@ services:
       - HOMEPAGE_VAR_BAZARR_API=${BAZARR_KEY}
       - HOMEPAGE_VAR_PROWLARR_URL=http://${PROWLARR_HOST}
       - HOMEPAGE_VAR_PROWLARR_API=${PROWLARR_KEY}
+
+      # JELLYSEERR
+      - HOMEPAGE_VAR_JELLYSEERR_URL=http://${JELLYSEERR_HOST}
+      - HOMEPAGE_VAR_JELLYSEERR_API=${JELLYSEERR_KEY}
 
       # EMBY
       - HOMEPAGE_VAR_EMBY_URL=http://${EMBY_HOST}
